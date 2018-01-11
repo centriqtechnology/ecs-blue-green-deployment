@@ -5,7 +5,7 @@ Description: >
 Parameters:
   GitHubUser:
     Type: String
-    Description: Your username on GitHub.
+    Description: Your username or organization on GitHub.
 
   GitHubRepo:
     Type: String
@@ -29,6 +29,11 @@ Parameters:
     Description: >
       S3 Bucket used for nested templates
 
+  AppName:
+    Type: String
+    Description: >
+      Name of the service
+
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -41,6 +46,8 @@ Metadata:
         default: "Branch"
       GitHubToken:
         default: "Personal Access Token"
+      AppName:
+        default: "Name of service to deploy"
     ParameterGroups:
       - Label:
           default: GitHub Configuration
@@ -49,6 +56,10 @@ Metadata:
           - GitHubBranch
           - GitHubUser
           - GitHubToken
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - AppName
 
 
 Resources:
