@@ -40,6 +40,9 @@ Parameters:
   ALBSg:
     Type: String
 
+  AppName:
+    Type: String
+
 
 
 Resources:
@@ -64,7 +67,7 @@ Resources:
       Matcher:
         HttpCode: 200-299
       HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /
+      HealthCheckPath: /up
       HealthCheckProtocol: HTTP
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
@@ -106,7 +109,12 @@ Resources:
         }
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
+        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -124,8 +132,8 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
-        - ContainerName: simple-app
-          ContainerPort: 80
+        - ContainerName: !Ref AppName
+          ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -139,23 +147,27 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Cpu: 256
-      Memory: 512
+      Cpu: 2048
+      Memory: 4096
       NetworkMode: awsvpc
       RequiresCompatibilities:
        - FARGATE
       ExecutionRoleArn: !GetAtt TaskIamRole.Arn
+      TaskRoleArn: !GetAtt TaskIamRole.Arn # Containers need access to Datomic transactor storage in DynamoDB
       ContainerDefinitions:
-        - Name: simple-app
+        - Name: !Ref AppName
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}:${Tag}
-          EntryPoint:
-            - /usr/sbin/apache2
-            - -D
-            - FOREGROUND
           Essential: true
-          Memory: 512
+          Memory: 4096
           PortMappings:
-            - ContainerPort: 80
+            - ContainerPort: 8080
+              HostPort: 8080
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AppName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: !Sub ${AppName}-${AWS::Region}-${Tag}
           Environment:
             - Name: Tag
               Value: !Ref Tag

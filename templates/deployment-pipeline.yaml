@@ -28,6 +28,9 @@ Parameters:
   VpcCIDR:
     Type: String
 
+  AppName:
+    Type: String
+
 Resources:
 
   BlueGreenFlipLambda:
@@ -131,6 +134,11 @@ Resources:
                 "Action": [ "sts:AssumeRole" ]
             }]
         }
+      ManagedPolicyArns:
+        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
+        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
       Policies:
         - PolicyName: root
           PolicyDocument:
@@ -165,7 +173,7 @@ Resources:
                   - ecr:InitiateLayerUpload
                   - ecr:UploadLayerPart
                   - ecr:CompleteLayerUpload
-
+                  
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -179,6 +187,11 @@ Resources:
                 "Action": [ "sts:AssumeRole" ]
             }]
         }
+      ManagedPolicyArns:
+        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
+        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
       Policies:
         - PolicyName: root
           PolicyDocument:
@@ -359,6 +372,7 @@ Resources:
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 ParameterOverrides: !Sub |
                   {
+                      "AppName": "${AppName}",
                       "Subnet1": "${Subnet1}",
                       "Subnet2": "${Subnet2}",
                       "VpcId": "${VpcId}",

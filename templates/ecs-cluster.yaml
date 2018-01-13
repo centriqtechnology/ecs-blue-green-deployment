@@ -40,6 +40,8 @@ Parameters:
     Description: >
       S3 Bucket used for nested templates
 
+  AppName:
+    Type: String
 
 Resources:
 
@@ -65,6 +67,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
+        AppName: !Ref AppName
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
         Port: 8080
@@ -83,6 +86,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
+        AppName: !Ref AppName
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
         Port: 80
