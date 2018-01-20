@@ -51,8 +51,10 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
+      Certificates:
+        - CertificateArn: "arn:aws:acm:us-east-1:381077719391:certificate/f1619f6f-e8c6-460b-afce-9ceb0d0aed79" # TODO - parameterize this
       Port: !Ref Port
-      Protocol: HTTP
+      Protocol: HTTPS
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
