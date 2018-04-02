@@ -2,6 +2,9 @@ Description: >
   Create Application Load Balancer resources for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  Env:
+    Type: String
+
   VpcId:
     Type: String
 
@@ -21,7 +24,7 @@ Resources:
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: !Sub ${AWS::StackName}-alb
+      GroupDescription: !Sub ${AWS::StackName}-${Env}-alb
       SecurityGroupIngress:
         - CidrIp: "0.0.0.0/0"
           IpProtocol: "TCP"

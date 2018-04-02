@@ -2,6 +2,9 @@ Description: >
   Create ECS Service for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  Env:
+    Type: String
+
   DesiredCount:
     Type: Number
     Default: 0
@@ -121,7 +124,7 @@ Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: !Sub ${AWS::StackName}
+      GroupDescription: !Sub ${AWS::StackName}-${Env}
       SecurityGroupIngress:
         - SourceSecurityGroupId: !Ref ALBSg
           IpProtocol: -1
@@ -134,7 +137,7 @@ Resources:
       LaunchType: FARGATE
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
-        - ContainerName: !Ref AppName
+        - ContainerName: !Sub ${AppName}-${Env}
           ContainerPort: 8080
           TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
@@ -157,7 +160,7 @@ Resources:
       ExecutionRoleArn: !GetAtt TaskIamRole.Arn
       TaskRoleArn: !GetAtt TaskIamRole.Arn # Containers need access to Datomic transactor storage in DynamoDB
       ContainerDefinitions:
-        - Name: !Ref AppName
+        - Name: !Sub ${AppName}-${Env}
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}:${Tag}
           Essential: true
           Memory: 4096
@@ -167,9 +170,9 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref AppName
+              awslogs-group: !Sub ${AppName}-${Env}
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: !Sub ${AppName}-${AWS::Region}-${Tag}
+              awslogs-stream-prefix: !Sub ${AppName}-${Env}-${AWS::Region}-${Tag}
           Environment:
             - Name: Tag
               Value: !Ref Tag

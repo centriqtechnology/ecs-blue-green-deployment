@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -o errexit -o xtrace
+echo -n "Enter an environment name (ex: staging or prod) > "
+read Env
 echo -n "Enter S3 Bucket to host the templates and scripts > "
 read bucket
 echo -n "Enter stackname to create or update the stack > "
@@ -26,4 +28,4 @@ aws s3 cp ecs-blue-green-deployment.yaml "s3://${bucket}" --acl public-read
 aws s3 cp --recursive templates/ "s3://${bucket}/templates" --acl public-read
 aws s3 cp --recursive scripts/ "s3://${bucket}/scripts" --acl public-read
 aws s3api put-bucket-versioning --bucket "${bucket}" --versioning-configuration Status=Enabled
-aws cloudformation deploy --stack-name $stackname --template-file ecs-blue-green-deployment.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides GitHubUser=$GitHubUser GitHubToken=$GitHubToken GitHubRepo=$GitHubRepo GitHubBranch=$GitHubBranch TemplateBucket=$bucket AppName=$AppName
+aws cloudformation deploy --no-execute-changeset --stack-name $stackname --template-file ecs-blue-green-deployment.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$Env GitHubUser=$GitHubUser GitHubToken=$GitHubToken GitHubRepo=$GitHubRepo GitHubBranch=$GitHubBranch TemplateBucket=$bucket AppName=$AppName

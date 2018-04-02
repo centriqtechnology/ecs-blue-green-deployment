@@ -2,6 +2,9 @@ Description: >
   Create ECS Cluster resources for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  Env:
+    Type: String
+
   InstanceType:
     Type: String
     Default: t2.large
@@ -48,7 +51,7 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Ref AWS::StackName
+      ClusterName: !Sub ${AWS::StackName}-${Env}
 
 
   LoadBalancer:
@@ -56,17 +59,19 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/load-balancer.yaml
       Parameters:
+        Env: !Ref Env
         Subnet1 : !Ref Subnet1
         Subnet2 : !Ref Subnet2
         VpcId: !Ref VpcId
         VpcCIDR: !Ref VpcCIDR
-        Name: !Ref GitHubRepo
+        Name: !Sub ${GitHubRepo}-${Env}
 
   GreenService:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
+        Env: !Ref Env
         AppName: !Ref AppName
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
@@ -86,6 +91,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
+        Env: !Ref Env
         AppName: !Ref AppName
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn

@@ -2,6 +2,9 @@ Description: >
   Create CodePipeline and CodeBuild resources for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  Env:
+    Type: String
+
   GitHubRepo:
     Type: String
 
@@ -36,10 +39,10 @@ Resources:
   BlueGreenFlipLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub lambda-${GitHubRepo}-blue-green-swap
+      FunctionName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap
       Handler: blue_green_flip.handler
       Runtime: python2.7
-      Description: !Sub lambda-${GitHubRepo}-blue-green-swap
+      Description: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap
       Code:
         S3Bucket: !Ref TemplateBucket
         S3Key: scripts.zip
@@ -50,7 +53,7 @@ Resources:
   BlueGreenFlipLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        #RoleName: !Sub lambda-${GitHubRepo}-blue-green-swap-role
+        #RoleName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -66,7 +69,7 @@ Resources:
   BlueGreenFlipLambdaPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub lambda-${GitHubRepo}-blue-green-swap-policy
+      PolicyName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -96,7 +99,7 @@ Resources:
     Type: AWS::IAM::Role
     DeletionPolicy: Retain
     Properties:
-      #RoleName: !Sub cfn-${AWS::StackName}
+      #RoleName: !Sub cfn-${AWS::StackName}-${Env}
       Path: /
       AssumeRolePolicyDocument: |
         {
@@ -124,7 +127,7 @@ Resources:
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
-      #RoleName: !Sub cb-${AWS::StackName}
+      #RoleName: !Sub cb-${AWS::StackName}-${Env}
       Path: /
       AssumeRolePolicyDocument: |
         {
@@ -177,7 +180,7 @@ Resources:
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
     Properties:
-      #RoleName: !Sub cp-${AWS::StackName}
+      #RoleName: !Sub cp-${AWS::StackName}-${Env}
       Path: /
       AssumeRolePolicyDocument: |
         {
@@ -237,11 +240,13 @@ Resources:
         Type: "LINUX_CONTAINER"
         PrivilegedMode: "true"
         EnvironmentVariables:
+          - Name: ENV
+            Value: !Ref Env
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: REPOSITORY_URI
             Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}
-      Name: !Sub ${AWS::StackName}-codebuildproject
+      Name: !Sub ${AWS::StackName}-${Env}-codebuildproject
       ServiceRole: !Ref CodeBuildServiceRole
 
   BlueGreenElbDiscovery:
@@ -275,8 +280,8 @@ Resources:
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: ELB_NAME
-            Value: !Ref GitHubRepo
-      Name: !Sub ${AWS::StackName}-discoveryproject
+            Value: !Sub ${GitHubRepo}-${Env}
+      Name: !Sub ${AWS::StackName}-${Env}-discoveryproject
       ServiceRole: !Ref CodeBuildServiceRole
 
   Pipeline:
@@ -366,12 +371,13 @@ Resources:
               Configuration:
                 ChangeSetName: Deploy
                 ActionMode: CREATE_UPDATE
-                StackName: !Sub "${AWS::StackName}-ecs-cluster"
+                StackName: !Sub "${AWS::StackName}-${Env}-ecs-cluster"
                 Capabilities: CAPABILITY_NAMED_IAM
                 TemplatePath: Template::templates/ecs-cluster.yaml
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 ParameterOverrides: !Sub |
                   {
+                      "Env": "${Env}",
                       "AppName": "${AppName}",
                       "Subnet1": "${Subnet1}",
                       "Subnet2": "${Subnet2}",
@@ -407,7 +413,7 @@ Resources:
                 FunctionName: !Ref BlueGreenFlipLambda
                 UserParameters: !Sub |
                   {
-                    "ElbName": "${GitHubRepo}"
+                    "ElbName": "${GitHubRepo}-${Env}"
                   }
               RunOrder: 3
 

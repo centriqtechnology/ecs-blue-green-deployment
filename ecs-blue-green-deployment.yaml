@@ -3,6 +3,10 @@ Description: >
 
 
 Parameters:
+  Env:
+    Type: String
+    Description: The environment name
+
   GitHubUser:
     Type: String
     Description: Your username or organization on GitHub.
@@ -68,6 +72,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/deployment-pipeline.yaml
       Parameters:
+        Env: !Ref Env
         AppName: !Ref AppName
         GitHubUser: !Ref GitHubUser
         GitHubToken: !Ref GitHubToken
@@ -84,7 +89,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/vpc.yaml
       Parameters:
-        Name: !Ref AWS::StackName
+        Name: !Sub ${AWS::StackName}-${Env}
         VpcCIDR: 10.215.0.0/16
         Subnet1CIDR: 10.215.10.0/24
         Subnet2CIDR: 10.215.20.0/24
