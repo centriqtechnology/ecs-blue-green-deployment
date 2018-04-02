@@ -17,12 +17,12 @@ elb_client = boto3.client('elbv2')
 describe_elb_response = None
 
 def handler():
-    """ Main handler as an entry point of code. Handler controls the sequence of methods to call.No inputs required. 
+    """ Main handler as an entry point of code. Handler controls the sequence of methods to call.No inputs required.
     As this runs in AWS CodeBuild, the script gets all the values from the environment variables in codebuild.
         1. Retrieve artifact (build.json) from the previous stage (CodeBuild phase, which builds application container images)
         2. Check if the load balancer exists. Name of the ELB is fed through environment variable by the pipeline.
-        3. Get tag key value of the target group, running on port 8080 and 80 with KeyName as "Identifier"
-        4. Get Sha of the image id running on target group at port 8080 and 80
+        3. Get tag key value of the target group, running on port 8443 and 443 with KeyName as "Identifier"
+        4. Get Sha of the image id running on target group at port 8443 and 443
         5. Edit the build.json retrieved from step-1 and append the values retrieved in step3 and step4
         6. Save the modified build.json. This file is the output from codebuild project and fed as an input to the CloudFormation
         execution stage.
@@ -50,7 +50,7 @@ def check_elb_exists():
 
                 Raises: None, as we dont want to stop script execution. If the code reaches exception block, it means
                 that the load balancer does not exists.
-                
+
                 Returns:
                     Boolean, True if Load Balancer Exists, False, if Load balancer does not exists
 
@@ -65,15 +65,15 @@ def check_elb_exists():
         return False
 
 def find_beta_targetgroup():
-    """ Discovers the green side ( non production side) target group, which is running on port 8080.
+    """ Discovers the green side ( non production side) target group, which is running on port 8443.
 
                 Args: None
                 Returns:
-                    beta_identifier : tag key value of the target group, running on port 8080 with KeyName as "Identifier"
-                    beta_sha: Sha or the image id running on target group at port 8080
-                    live_identifier : tag key value of the target group, running on port 80 with KeyName as "Identifier"
-                    live_sha: Sha or the image id running on target group at port 80
-                    
+                    beta_identifier : tag key value of the target group, running on port 8443 with KeyName as "Identifier"
+                    beta_sha: Sha or the image id running on target group at port 8443
+                    live_identifier : tag key value of the target group, running on port 443 with KeyName as "Identifier"
+                    live_sha: Sha or the image id running on target group at port 443
+
 
                 Raises:
                     Exception: Any exception thrown by handler
@@ -83,8 +83,12 @@ def find_beta_targetgroup():
     listners = elb_client.describe_listeners(LoadBalancerArn=describe_elb_response['LoadBalancers'][0]['LoadBalancerArn'])
 
     for x in listners['Listeners']:
+        if (x['Port'] == 443):
+            livelistenerarn = x['ListenerArn']
         if (x['Port'] == 80):
             livelistenerarn = x['ListenerArn']
+        if (x['Port'] == 8443):
+            betalistenerarn = x['ListenerArn']
         if (x['Port'] == 8080):
             betalistenerarn = x['ListenerArn']
 
@@ -113,7 +117,7 @@ def find_beta_image_identifier(targetgrouparn):
                 Returns:
                     identifier : tag key value of the target group , with KeyName as "Identifier"
                     sha: Sha or the image id running on target group
-                    
+
                 Raises:
                     Exception: Any exception thrown by handler
 
@@ -133,7 +137,7 @@ def find_beta_image_identifier(targetgrouparn):
 def get_build_artifact_id(build_id):
     """Get artifact (build.json) from the build project . We are making this as an additional call to get the build.json
     which already contains the new built repository ECR path. We could have consolidated this script and executed in the build
-    phase, but as codebuild accepts the input from one source only (scripts and application code are in different sources), thats 
+    phase, but as codebuild accepts the input from one source only (scripts and application code are in different sources), thats
     why an additional call to retrieve build.json from a different build project.
 
                     Args:
