@@ -64,7 +64,7 @@ Resources:
         Subnet2 : !Ref Subnet2
         VpcId: !Ref VpcId
         VpcCIDR: !Ref VpcCIDR
-        Name: !Sub ${GitHubRepo}-${Env}
+        Name: !Sub ${AppName}-${Env}
 
   GreenService:
     Type: AWS::CloudFormation::Stack
