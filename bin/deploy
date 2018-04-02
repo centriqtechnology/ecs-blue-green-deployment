@@ -3,7 +3,7 @@
 set -o errexit -o xtrace
 echo -n "Enter an environment name (ex: staging or prod) > "
 read Env
-echo -n "Enter a relative path to the buildspec file > "
+echo -n "Enter a relative path to the BuildSpec file if it is not located at the root of the repository > "
 read BuildSpec
 echo -n "Enter S3 Bucket to host the templates and scripts > "
 read bucket
@@ -30,4 +30,17 @@ aws s3 cp ecs-blue-green-deployment.yaml "s3://${bucket}" --acl public-read
 aws s3 cp --recursive templates/ "s3://${bucket}/templates" --acl public-read
 aws s3 cp --recursive scripts/ "s3://${bucket}/scripts" --acl public-read
 aws s3api put-bucket-versioning --bucket "${bucket}" --versioning-configuration Status=Enabled
-aws cloudformation deploy --no-execute-changeset --stack-name $stackname --template-file ecs-blue-green-deployment.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides Env=$Env BuildSpec=$BuildSpec GitHubUser=$GitHubUser GitHubToken=$GitHubToken GitHubRepo=$GitHubRepo GitHubBranch=$GitHubBranch TemplateBucket=$bucket AppName=$AppName
+
+
+# NOTE It seems like despite what the documentation says, using the awslogs
+# driver with fargate does NOT automatically create the associated LogGroup. We
+# should be able to update the template in order to create that resource
+# instead, this is a quick and dirty way to get it out of the way...
+# TODO Parametrize region?
+aws logs create-log-group --log-group-name "${AppName}-${Env}" --region us-east-1 || true
+aws cloudformation deploy \
+    --role-arn arn:aws:iam::381077719391:role/zathras \
+    --stack-name $stackname \
+    --template-file ecs-blue-green-deployment.yaml \
+    --capabilities CAPABILITY_IAM \
+    --parameter-overrides Env=$Env BuildSpec=$BuildSpec GitHubUser=$GitHubUser GitHubToken=$GitHubToken GitHubRepo=$GitHubRepo GitHubBranch=$GitHubBranch TemplateBucket=$bucket AppName=$AppName
