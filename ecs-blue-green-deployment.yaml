@@ -7,6 +7,10 @@ Parameters:
     Type: String
     Description: The environment name
 
+  BuildSpec:
+    Type: String
+    Description: A relative path to the service's buildspec file
+
   GitHubUser:
     Type: String
     Description: Your username or organization on GitHub.
@@ -73,6 +77,7 @@ Resources:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/deployment-pipeline.yaml
       Parameters:
         Env: !Ref Env
+        BuildSpec: !Ref BuildSpec
         AppName: !Ref AppName
         GitHubUser: !Ref GitHubUser
         GitHubToken: !Ref GitHubToken

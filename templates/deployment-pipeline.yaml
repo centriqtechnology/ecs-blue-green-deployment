@@ -5,6 +5,9 @@ Parameters:
   Env:
     Type: String
 
+  BuildSpec:
+    Type: String
+
   GitHubRepo:
     Type: String
 
@@ -230,6 +233,7 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
       Source:
+        BuildSpec: !Ref BuildSpec
         Type: CODEPIPELINE
       ## NOTE we depend on repos that want to participate in this ecosystem to provide
       ## a buildspec that pushes a Docker image to ECR and puts its tag in an uploaded
