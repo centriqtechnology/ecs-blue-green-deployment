@@ -1,6 +1,9 @@
 #!/bin/bash
 
 set -o errexit -o xtrace
+set -euo pipefail
+set -u
+
 echo -n "Enter an environment name (ex: staging or prod) > "
 read Env
 echo -n "Enter a relative path to the BuildSpec file if it is not located at the root of the repository > "
@@ -17,7 +20,7 @@ echo -n "Enter GitHubRepo > "
 read GitHubRepo
 echo -n "Enter GitHubBranch > "
 read GitHubBranch
-echo -n "Enter AppName > "
+echo -n "Enter AppName, should be less than (31 - env length) > "
 read AppName
 
 zip deploy/templates.zip ecs-blue-green-deployment.yaml templates/*
@@ -38,6 +41,7 @@ aws s3api put-bucket-versioning --bucket "${bucket}" --versioning-configuration 
 # instead, this is a quick and dirty way to get it out of the way...
 # TODO Parametrize region?
 aws logs create-log-group --log-group-name "${AppName}-${Env}" --region us-east-1 || true
+
 aws cloudformation deploy \
     --role-arn arn:aws:iam::381077719391:role/zathras \
     --stack-name $stackname \
