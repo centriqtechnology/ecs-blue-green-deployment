@@ -2,6 +2,9 @@ Description: >
   Create Application Load Balancer resources for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  AppName:
+    Type: String
+
   Env:
     Type: String
 
@@ -16,15 +19,12 @@ Parameters:
   Subnet2:
     Type: AWS::EC2::Subnet::Id
 
-  Name:
-    Type: String
-
 
 Resources:
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
-      GroupDescription: !Sub ${AWS::StackName}-${Env}-alb
+      GroupDescription: !Sub ${AppName}-{Env}-alb
       SecurityGroupIngress:
         - CidrIp: "0.0.0.0/0"
           IpProtocol: "TCP"
@@ -40,17 +40,28 @@ Resources:
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Ref Name
+      Name: !Sub ${AppName}-${Env}
       Subnets:
         - !Ref Subnet1
         - !Ref Subnet2
       SecurityGroups:
         - !Ref SecurityGroup
         
+  DNS:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: centriqhome.com.
+      RecordSets:
+      - Name: !Sub ${AppName}-${Env}.centriqhome.com.
+        Type: A
+        AliasTarget:
+          HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+          DNSName: !GetAtt LoadBalancer.DNSName
+
 Outputs:
   ServiceUrl:
-    Description: URL of the load balancer for the sample service.
-    Value: !Sub http://${LoadBalancer.DNSName}
+    Description: URL of the service.
+    Value: !Sub https://${AppName}-${Env}.centriqhome.com
 
   SecurityGroup:
     Value: !Ref SecurityGroup

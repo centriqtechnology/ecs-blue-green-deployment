@@ -59,12 +59,12 @@ Resources:
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/load-balancer.yaml
       Parameters:
+        AppName: !Ref AppName
         Env: !Ref Env
         Subnet1 : !Ref Subnet1
         Subnet2 : !Ref Subnet2
         VpcId: !Ref VpcId
         VpcCIDR: !Ref VpcCIDR
-        Name: !Sub ${GitHubRepo}-${Env}
 
   GreenService:
     Type: AWS::CloudFormation::Stack

@@ -126,6 +126,10 @@ Resources:
                   - ec2:*
                   - elasticloadbalancing:*
                   - autoscaling:*
+                  - route53:ListResourceRecordSets
+                  - route53:ListHostedZones
+                  - route53:GetChange
+                  - route53:ChangeResourceRecordSets
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -284,7 +288,7 @@ Resources:
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: ELB_NAME
-            Value: !Sub ${GitHubRepo}-${Env}
+            Value: !Sub ${AppName}-${Env}
       Name: !Sub ${AWS::StackName}-${Env}-discoveryproject
       ServiceRole: !Ref CodeBuildServiceRole
 
@@ -417,7 +421,7 @@ Resources:
                 FunctionName: !Ref BlueGreenFlipLambda
                 UserParameters: !Sub |
                   {
-                    "ElbName": "${GitHubRepo}-${Env}"
+                    "ElbName": "${AppName}-${Env}"
                   }
               RunOrder: 3
 
