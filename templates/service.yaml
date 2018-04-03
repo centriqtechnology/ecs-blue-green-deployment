@@ -134,6 +134,7 @@ Resources:
     Properties:
       Cluster: !Ref Cluster
       DesiredCount: !Ref DesiredCount
+      HealthCheckGracePeriodSeconds: 60
       LaunchType: FARGATE
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
