@@ -2,6 +2,9 @@ Description: >
   Create ECS Service for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  AppName:
+    Type: String
+
   Env:
     Type: String
 
@@ -42,10 +45,6 @@ Parameters:
 
   ALBSg:
     Type: String
-
-  AppName:
-    Type: String
-
 
 
 Resources:

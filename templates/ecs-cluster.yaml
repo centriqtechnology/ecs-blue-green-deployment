@@ -35,9 +35,6 @@ Parameters:
   Repository:
     Type: String
 
-  GitHubRepo:
-    Type: String
-
   TemplateBucket:
     Type: String
     Description: >

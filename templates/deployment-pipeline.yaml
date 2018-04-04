@@ -2,6 +2,9 @@ Description: >
   Create CodePipeline and CodeBuild resources for Blue/Green Deployment on ECS. For further reference, please review BluegreenRepo ==> https://github.com/awslabs/ecs-blue-green-deployment
 
 Parameters:
+  AppName:
+    Type: String
+
   Env:
     Type: String
 
@@ -34,18 +37,15 @@ Parameters:
   VpcCIDR:
     Type: String
 
-  AppName:
-    Type: String
-
 Resources:
 
   BlueGreenFlipLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap
+      FunctionName: !Sub lambda-${AppName}-${Env}-blue-green-swap
       Handler: blue_green_flip.handler
       Runtime: python2.7
-      Description: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap
+      Description: !Sub lambda-${AppName}-${Env}-blue-green-swap
       Code:
         S3Bucket: !Ref TemplateBucket
         S3Key: scripts.zip
@@ -56,7 +56,7 @@ Resources:
   BlueGreenFlipLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        #RoleName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap-role
+        #RoleName: !Sub lambda-${AppName}-${Env}-blue-green-swap-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -72,7 +72,7 @@ Resources:
   BlueGreenFlipLambdaPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub lambda-${GitHubRepo}-${Env}-blue-green-swap-policy
+      PolicyName: !Sub lambda-${AppName}-${Env}-blue-green-swap-policy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -134,7 +134,7 @@ Resources:
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
     Properties:
-      #RoleName: !Sub cb-${AWS::StackName}-${Env}
+      #RoleName: !Sub cb-${AppName}-${Env}
       Path: /
       AssumeRolePolicyDocument: |
         {
@@ -394,7 +394,6 @@ Resources:
                       "Code1" : { "Fn::GetParam" : [ "DiscoveryOutput", "cf_inputs.json", "Code1" ] },
                       "Code2" : { "Fn::GetParam" : [ "DiscoveryOutput", "cf_inputs.json", "Code2" ] },
                       "Repository": "${Repository}",
-                      "GitHubRepo": "${GitHubRepo}",
                       "TemplateBucket": "${TemplateBucket}"
 
                   }
