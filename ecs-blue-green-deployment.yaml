@@ -34,6 +34,11 @@ Parameters:
     Description: >
       Name of the service
 
+  AppEnvironment:
+    Type: String
+    Description: >
+      Which environment to reference
+
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -48,6 +53,8 @@ Metadata:
         default: "Personal Access Token"
       AppName:
         default: "Name of service to deploy"
+      AppName:
+        default: "Which environment to reference"
     ParameterGroups:
       - Label:
           default: GitHub Configuration
@@ -60,6 +67,7 @@ Metadata:
           default: Service Configuration
         Parameters:
           - AppName
+          - AppEnvironment
 
 
 Resources:
@@ -69,6 +77,7 @@ Resources:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/deployment-pipeline.yaml
       Parameters:
         AppName: !Ref AppName
+        AppEnvironment: !Ref AppEnvironment
         GitHubUser: !Ref GitHubUser
         GitHubToken: !Ref GitHubToken
         GitHubRepo: !Ref GitHubRepo

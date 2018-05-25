@@ -15,15 +15,17 @@ echo -n "Enter GitHubBranch > "
 read GitHubBranch
 echo -n "Enter AppName > "
 read AppName
+echo -n "Enter AppEnvironment > "
+read AppEnvironment
 
 zip deploy/templates.zip ecs-blue-green-deployment.yaml templates/*
 cd scripts && zip scripts.zip * && cd ..
 mv scripts/scripts.zip deploy/scripts.zip
 
-aws s3 cp deploy/templates.zip "s3://${bucket}" --acl public-read
-aws s3 cp deploy/scripts.zip "s3://${bucket}" --acl public-read
-aws s3 cp ecs-blue-green-deployment.yaml "s3://${bucket}" --acl public-read
-aws s3 cp --recursive templates/ "s3://${bucket}/templates" --acl public-read
-aws s3 cp --recursive scripts/ "s3://${bucket}/scripts" --acl public-read
-aws s3api put-bucket-versioning --bucket "${bucket}" --versioning-configuration Status=Enabled
-aws cloudformation deploy --stack-name $stackname --template-file ecs-blue-green-deployment.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides GitHubUser=$GitHubUser GitHubToken=$GitHubToken GitHubRepo=$GitHubRepo GitHubBranch=$GitHubBranch TemplateBucket=$bucket AppName=$AppName
+aws s3 cp deploy/templates.zip "s3://${bucket:-centriq-ecs-api}" --acl public-read
+aws s3 cp deploy/scripts.zip "s3://${bucket:-centriq-ecs-api}" --acl public-read
+aws s3 cp ecs-blue-green-deployment.yaml "s3://${bucket:-centriq-ecs-api}" --acl public-read
+aws s3 cp --recursive templates/ "s3://${bucket:-centriq-ecs-api}/templates" --acl public-read
+aws s3 cp --recursive scripts/ "s3://${bucket:-centriq-ecs-api}/scripts" --acl public-read
+aws s3api put-bucket-versioning --bucket "${bucket:-centriq-ecs-api}" --versioning-configuration Status=Enabled
+aws cloudformation deploy --stack-name ${stackname:-api-staging} --template-file ecs-blue-green-deployment.yaml --capabilities CAPABILITY_NAMED_IAM --parameter-overrides GitHubUser=${GitHubUser:-centriqtechnology} GitHubToken=${GitHubToken:-df5907b4a102e759902fa83bdf5116074a956eda} GitHubRepo=${GitHubRepo:-centriq-web} GitHubBranch=${GitHubBranch:-feature/dockerize} TemplateBucket=${bucket:-centriq-ecs-api} AppName=${AppName:-api-staging} AppEnvironment=${AppEnvironment:-staging}

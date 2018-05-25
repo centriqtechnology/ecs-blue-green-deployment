@@ -43,6 +43,9 @@ Parameters:
   AppName:
     Type: String
 
+  AppEnvironment:
+    Type: String
+
 Resources:
 
   Cluster:
@@ -68,6 +71,7 @@ Resources:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
         AppName: !Ref AppName
+        AppEnvironment: !Ref AppEnvironment
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
         Port: 8443
@@ -87,6 +91,7 @@ Resources:
       TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/service.yaml
       Parameters:
         AppName: !Ref AppName
+        AppEnvironment: !Ref AppEnvironment
         Cluster: !Ref Cluster
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
         Port: 443

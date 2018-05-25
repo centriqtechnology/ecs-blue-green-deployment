@@ -31,6 +31,9 @@ Parameters:
   AppName:
     Type: String
 
+  AppEnvironment:
+    Type: String
+
 Resources:
 
   BlueGreenFlipLambda:
@@ -90,6 +93,8 @@ Resources:
 
   Repository:
     Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub ${AppName}-${AppEnvironment}
     DeletionPolicy: Retain
 
   CloudFormationExecutionRole:
@@ -188,9 +193,9 @@ Resources:
             }]
         }
       ManagedPolicyArns:
-        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
         - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-staging-full
+        - arn:aws:iam::381077719391:policy/centriq-api-ssm-staging
         - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
       Policies:
         - PolicyName: root
@@ -374,6 +379,7 @@ Resources:
                 ParameterOverrides: !Sub |
                   {
                       "AppName": "${AppName}",
+                      "AppEnvironment": "${AppEnvironment}",
                       "Subnet1": "${Subnet1}",
                       "Subnet2": "${Subnet2}",
                       "VpcId": "${VpcId}",
