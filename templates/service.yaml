@@ -137,7 +137,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
         - ContainerName: !Ref AppName
-          ContainerPort: 8080
+          ContainerPort: !Ref Port
           TargetGroupArn: !Ref TargetGroup
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -165,7 +165,6 @@ Resources:
           Memory: 4096
           PortMappings:
             - ContainerPort: !Ref Port
-              HostPort: !Ref Port
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -175,7 +174,7 @@ Resources:
           Environment:
             - Name: Tag
               Value: !Ref Tag
-            - Name: Environment
+            - Name: ENV
               Value: !Ref AppEnvironment
             - Name: PORT
               Value: !Ref Port
