@@ -116,9 +116,9 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
         - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
-        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
         - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
+        - arn:aws:iam::381077719391:policy/centriq-web-staging-full
+        - arn:aws:iam::381077719391:policy/centriq-api-ssm-staging
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -164,8 +164,8 @@ Resources:
           Essential: true
           Memory: 4096
           PortMappings:
-            - ContainerPort: 8080
-              HostPort: 8080
+            - ContainerPort: !Ref Port
+              HostPort: !Ref Port
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -177,3 +177,5 @@ Resources:
               Value: !Ref Tag
             - Name: Environment
               Value: !Ref AppEnvironment
+            - Name: PORT
+              Value: !Ref Port
