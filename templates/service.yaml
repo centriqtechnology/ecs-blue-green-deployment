@@ -149,8 +149,8 @@ Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Cpu: 2048
-      Memory: 4096
+      Cpu: 4096
+      Memory: 12288
       NetworkMode: awsvpc
       RequiresCompatibilities:
        - FARGATE

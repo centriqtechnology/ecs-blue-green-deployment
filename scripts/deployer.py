@@ -21,8 +21,8 @@ def handler():
     As this runs in AWS CodeBuild, the script gets all the values from the environment variables in codebuild.
         1. Retrieve artifact (build.json) from the previous stage (CodeBuild phase, which builds application container images)
         2. Check if the load balancer exists. Name of the ELB is fed through environment variable by the pipeline.
-        3. Get tag key value of the target group, running on port 8080 and 80 with KeyName as "Identifier"
-        4. Get Sha of the image id running on target group at port 8080 and 80
+        3. Get tag key value of the target group, running on port 8443 and 443 with KeyName as "Identifier"
+        4. Get Sha of the image id running on target group at port 8443 and 443
         5. Edit the build.json retrieved from step-1 and append the values retrieved in step3 and step4
         6. Save the modified build.json. This file is the output from codebuild project and fed as an input to the CloudFormation
         execution stage.
@@ -65,15 +65,14 @@ def check_elb_exists():
         return False
 
 def find_beta_targetgroup():
-    """ Discovers the green side ( non production side) target group, which is running on port 8080.
+    """ Discovers the green side ( non production side) target group, which is running on port 8443.
 
                 Args: None
                 Returns:
-                    beta_identifier : tag key value of the target group, running on port 8080 with KeyName as "Identifier"
-                    beta_sha: Sha or the image id running on target group at port 8080
-                    live_identifier : tag key value of the target group, running on port 80 with KeyName as "Identifier"
-                    live_sha: Sha or the image id running on target group at port 80
-                    
+                    beta_identifier : tag key value of the target group, running on port 8443 with KeyName as "Identifier"
+                    beta_sha: Sha or the image id running on target group at port 8443
+                    live_identifier : tag key value of the target group, running on port 443 with KeyName as "Identifier"
+                    live_sha: Sha or the image id running on target group at port 443
 
                 Raises:
                     Exception: Any exception thrown by handler
@@ -83,9 +82,9 @@ def find_beta_targetgroup():
     listners = elb_client.describe_listeners(LoadBalancerArn=describe_elb_response['LoadBalancers'][0]['LoadBalancerArn'])
 
     for x in listners['Listeners']:
-        if (x['Port'] == 80):
+        if (x['Port'] == 443):
             livelistenerarn = x['ListenerArn']
-        if (x['Port'] == 8080):
+        if (x['Port'] == 8443):
             betalistenerarn = x['ListenerArn']
 
     beta_tg_response = elb_client.describe_rules(ListenerArn=betalistenerarn)
