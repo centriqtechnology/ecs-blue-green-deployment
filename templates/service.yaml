@@ -66,13 +66,14 @@ Resources:
     Properties:
       VpcId: !Ref VpcId
       TargetType: ip
-      Port: 8080
+      Port: !Port
       Protocol: HTTP
       Matcher:
         HttpCode: 200-299
       HealthCheckIntervalSeconds: 10
       HealthCheckPath: /up
       HealthCheckProtocol: HTTP
+      HealthCheckPort: 8080
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       TargetGroupAttributes:
