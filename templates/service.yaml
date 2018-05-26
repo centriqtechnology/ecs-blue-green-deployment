@@ -165,7 +165,7 @@ Resources:
           Essential: true
           Memory: 4096
           PortMappings:
-            - ContainerPort: !Ref Port
+            - ContainerPort: 8080
           LogConfiguration:
             LogDriver: awslogs
             Options:
