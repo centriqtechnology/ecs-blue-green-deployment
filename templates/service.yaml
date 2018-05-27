@@ -75,7 +75,7 @@ Resources:
       HealthCheckProtocol: HTTP
       HealthCheckPort: 8080
       HealthCheckTimeoutSeconds: 60
-      HealthyThresholdCount: 1
+      HealthyThresholdCount: 3
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
