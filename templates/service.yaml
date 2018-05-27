@@ -70,12 +70,12 @@ Resources:
       Protocol: HTTP
       Matcher:
         HttpCode: 200-299
-      HealthCheckIntervalSeconds: 25
+      HealthCheckIntervalSeconds: 65
       HealthCheckPath: /up
       HealthCheckProtocol: HTTP
       HealthCheckPort: 8080
-      HealthCheckTimeoutSeconds: 20
-      HealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 60
+      HealthyThresholdCount: 1
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
           Value: 30
