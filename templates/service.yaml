@@ -55,6 +55,7 @@ Resources:
       LoadBalancerArn: !Ref LoadBalancer
       Certificates:
         - CertificateArn: "arn:aws:acm:us-east-1:381077719391:certificate/f1619f6f-e8c6-460b-afce-9ceb0d0aed79" # TODO - parameterize this
+          CertificateArn: "arn:aws:acm:us-east-1:381077719391:certificate/b0591062-e02f-4725-99ba-8959659640cf" # TODO - parameterize this too
       Port: !Ref Port
       Protocol: HTTPS
       DefaultActions:
