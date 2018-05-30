@@ -163,7 +163,7 @@ Resources:
         - Name: !Ref AppName
           Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}:${Tag}
           Essential: true
-          Memory: 4096
+          Memory: 12288
           PortMappings:
             - ContainerPort: 8080
           LogConfiguration:
