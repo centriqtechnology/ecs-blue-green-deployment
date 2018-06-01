@@ -104,8 +104,21 @@ Resources:
         Subnet1 : !Ref Subnet1
         Subnet2 : !Ref Subnet2
         ALBSg : !GetAtt LoadBalancer.Outputs.SecurityGroup
-
-
+ 
+  RedirectService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${TemplateBucket}/templates/redirect-service.yaml
+      Parameters:
+        AppName: !Sub ${AppName}-HTTPSRedirect
+        Cluster: !Ref Cluster
+        LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
+        DesiredCount: "1"
+        VpcId: !Ref VpcId
+        Identifier: "HTTPSRedirect"
+        Subnet1 : !Ref Subnet1
+        Subnet2 : !Ref Subnet2
+        ALBSg : !GetAtt LoadBalancer.Outputs.SecurityGroup
 Outputs:
   ClusterName:
       Value: !Ref Cluster

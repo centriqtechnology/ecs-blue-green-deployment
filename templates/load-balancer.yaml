@@ -32,6 +32,10 @@ Resources:
           IpProtocol: "TCP"
           FromPort: 8443
           ToPort: 8443
+        - CidrIp: "0.0.0.0/0" # To allow HTTP -> HTTPS redirects
+          IpProtocol: "TCP"
+          FromPort: 80
+          ToPort: 80
       VpcId: !Ref VpcId
 
   LoadBalancer:
