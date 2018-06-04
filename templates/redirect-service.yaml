@@ -98,7 +98,10 @@ Resources:
                 "Action": [ "sts:AssumeRole" ]
             }]
         }
-           
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
   Service:
     Type: AWS::ECS::Service
     Properties:
@@ -141,4 +144,4 @@ Resources:
             Options:
               awslogs-group: !Ref AppName
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: !Sub HTTPSRedirect-${AWS::Region}-${AppName}
+              awslogs-stream-prefix: !Sub ${AppName}-${AWS::Region}
