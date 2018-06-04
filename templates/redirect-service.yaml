@@ -141,4 +141,4 @@ Resources:
             Options:
               awslogs-group: !Ref AppName
               awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: !Sub HTTPSRedirect-${AWS::Region}-${Tag}
+              awslogs-stream-prefix: !Sub HTTPSRedirect-${AWS::Region}-${AppName}
