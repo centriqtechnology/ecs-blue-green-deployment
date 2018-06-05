@@ -236,6 +236,9 @@ Resources:
       ## NOTE we depend on repos that want to participate in this ecosystem to provide
       ## a buildspec that pushes a Docker image to ECR and puts its tag in an uploaded
       ## build.json file
+      Cache:
+        Type: "S3"
+        Location: !Sub ${ArtifactBucket}/archives/buildcache
       Environment:
         ComputeType: "BUILD_GENERAL1_SMALL"
         Image: "381077719391.dkr.ecr.us-east-1.amazonaws.com/devops/codebuild/docker-jdk8-boot:latest"
