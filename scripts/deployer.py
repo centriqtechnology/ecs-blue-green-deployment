@@ -82,14 +82,15 @@ def find_beta_targetgroup():
     listners = elb_client.describe_listeners(LoadBalancerArn=describe_elb_response['LoadBalancers'][0]['LoadBalancerArn'])
 
     for x in listners['Listeners']:
-        print("Found listener ARN: " + x['ListenerArn'] + " on port: " + str(x['Port']))
         if (x['Port'] == 443):
-            livelistenerarn = x['ListenerArn']
-        if (x['Port'] == 8443):
-            betalistenerarn = x['ListenerArn']
+          print("Found live listener ARN: " + x['ListenerArn'] + " on port: " + str(x['Port']))
+          livelistenerarn = x['ListenerArn']
+        elif (x['Port'] == 8443):
+          print("Found beta listener ARN: " + x['ListenerArn'] + " on port: " + str(x['Port']))
+          betalistenerarn = x['ListenerArn']
         else:           
-            continue
-
+          print("Found unused listener ARN: " + x['ListenerArn'] + " on port: " + str(x['Port']))
+          pass
     beta_tg_response = elb_client.describe_rules(ListenerArn=betalistenerarn)
     live_tg_response = elb_client.describe_rules(ListenerArn=livelistenerarn)
 
