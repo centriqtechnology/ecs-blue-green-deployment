@@ -115,7 +115,7 @@ Resources:
         LoadBalancer: !GetAtt LoadBalancer.Outputs.LoadBalancerArn
         DesiredCount: "1"
         VpcId: !Ref VpcId
-        Identifier: "HTTPSRedirect"
+        Identifier: "Code2" # TODO: Put this back to 'HTTPSRedirect' after fixing deployer.py!
         Subnet1 : !Ref Subnet1
         Subnet2 : !Ref Subnet2
         ALBSg : !GetAtt LoadBalancer.Outputs.SecurityGroup
