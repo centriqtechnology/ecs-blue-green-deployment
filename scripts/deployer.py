@@ -86,7 +86,7 @@ def find_beta_targetgroup():
             livelistenerarn = x['ListenerArn']
         if (x['Port'] == 8443):
             betalistenerarn = x['ListenerArn']
-        else
+        else:
             continue
 
     beta_tg_response = elb_client.describe_rules(ListenerArn=betalistenerarn)
