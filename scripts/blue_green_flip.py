@@ -113,11 +113,7 @@ def swaptargetgroups(elbname):
     for x in listners['Listeners']:
         if (x['Port'] == 443):
             livelistenerarn = x['ListenerArn']
-        if (x['Port'] == 80):
-            livelistenerarn = x['ListenerArn']
         if (x['Port'] == 8443):
-            betalistenerarn = x['ListenerArn']
-        if (x['Port'] == 8080):
             betalistenerarn = x['ListenerArn']
 
     livetgresponse = elbclient.describe_rules(ListenerArn=livelistenerarn)
