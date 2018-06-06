@@ -95,7 +95,6 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub ${AppName}-${AppEnvironment}
-    DeletionPolicy: Retain
 
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
