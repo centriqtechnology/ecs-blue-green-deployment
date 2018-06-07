@@ -39,10 +39,10 @@ Resources:
   BlueGreenFlipLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub lambda-${GitHubRepo}-blue-green-swap
+      FunctionName: !Sub lambda-${GitHubRepo}-${GitHubBranch}-blue-green-swap
       Handler: blue_green_flip.handler
       Runtime: python2.7
-      Description: !Sub lambda-${GitHubRepo}-blue-green-swap
+      Description: !Sub lambda-${GitHubRepo}-${GitHubBranch}-blue-green-swap
       Code:
         S3Bucket: !Ref TemplateBucket
         S3Key: scripts.zip
@@ -139,10 +139,8 @@ Resources:
             }]
         }
       ManagedPolicyArns:
-        - arn:aws:iam::381077719391:policy/centriq-web-production-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-test-dynamodb
-        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-web-${AppEnvironment}-dynamodb
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/kms-codebuild-read-access
       Policies:
         - PolicyName: root
           PolicyDocument:
@@ -192,10 +190,10 @@ Resources:
             }]
         }
       ManagedPolicyArns:
-        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-staging-full
-        - arn:aws:iam::381077719391:policy/centriq-api-ssm-staging
-        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-web-${AppEnvironment}-dynamodb
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-web-${AppEnvironment}-full
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-api-ssm-${AppEnvironment}
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/kms-codebuild-read-access
       Policies:
         - PolicyName: root
           PolicyDocument:
@@ -240,7 +238,7 @@ Resources:
         Location: !Sub ${ArtifactBucket}/archives/buildcache
       Environment:
         ComputeType: "BUILD_GENERAL1_SMALL"
-        Image: "381077719391.dkr.ecr.us-east-1.amazonaws.com/devops/codebuild/docker-jdk8-boot:latest"
+        Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/devops/codebuild/docker-jdk8-boot:latest
         Type: "LINUX_CONTAINER"
         PrivilegedMode: "true"
         EnvironmentVariables:

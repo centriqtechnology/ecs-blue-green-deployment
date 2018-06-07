@@ -117,10 +117,10 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
         - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
-        - arn:aws:iam::381077719391:policy/kms-codebuild-read-access
-        - arn:aws:iam::381077719391:policy/centriq-web-staging-dynamodb
-        - arn:aws:iam::381077719391:policy/centriq-web-staging-full
-        - arn:aws:iam::381077719391:policy/centriq-api-ssm-staging
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/kms-codebuild-read-access
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-web-${AppEnvironment}-dynamodb
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-web-${AppEnvironment}-full
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/centriq-api-ssm-${AppEnvironment}
 
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
