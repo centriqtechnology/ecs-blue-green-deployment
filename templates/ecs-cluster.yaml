@@ -35,6 +35,9 @@ Parameters:
   GitHubRepo:
     Type: String
 
+  HostName:
+    Type: String
+
   TemplateBucket:
     Type: String
     Description: >
@@ -53,7 +56,6 @@ Resources:
     Properties:
       ClusterName: !Ref AWS::StackName
 
-
   LoadBalancer:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -63,7 +65,8 @@ Resources:
         Subnet2 : !Ref Subnet2
         VpcId: !Ref VpcId
         VpcCIDR: !Ref VpcCIDR
-        Name: !Ref GitHubRepo
+        Name: !Sub ${AppName}-${AppEnvironment}
+        HostName: !Ref HostName
 
   GreenService:
     Type: AWS::CloudFormation::Stack
@@ -104,7 +107,7 @@ Resources:
         Subnet1 : !Ref Subnet1
         Subnet2 : !Ref Subnet2
         ALBSg : !GetAtt LoadBalancer.Outputs.SecurityGroup
- 
+
   RedirectService:
     Type: AWS::CloudFormation::Stack
     Properties:

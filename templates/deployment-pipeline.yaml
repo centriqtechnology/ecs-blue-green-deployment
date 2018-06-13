@@ -34,6 +34,8 @@ Parameters:
   AppEnvironment:
     Type: String
 
+  HostName:
+    Type: String
 Resources:
 
   BlueGreenFlipLambda:
@@ -124,6 +126,7 @@ Resources:
                   - ec2:*
                   - elasticloadbalancing:*
                   - autoscaling:*
+                  - route53:*
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -281,7 +284,7 @@ Resources:
           - Name: AWS_DEFAULT_REGION
             Value: !Ref AWS::Region
           - Name: ELB_NAME
-            Value: !Ref GitHubRepo
+            Value: !Sub ${AppName}-${AppEnvironment}
       Name: !Sub ${AWS::StackName}-discoveryproject
       ServiceRole: !Ref CodeBuildServiceRole
 
@@ -380,6 +383,7 @@ Resources:
                   {
                       "AppName": "${AppName}",
                       "AppEnvironment": "${AppEnvironment}",
+                      "HostName": "${HostName}",
                       "Subnet1": "${Subnet1}",
                       "Subnet2": "${Subnet2}",
                       "VpcId": "${VpcId}",

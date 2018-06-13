@@ -39,7 +39,11 @@ Parameters:
     Description: >
       Which environment to reference
 
-
+  HostName:
+    Type: String
+    Description: >
+      Desired hostname in centriqhome.com and centriq.me for this stack
+      
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterLabels:
@@ -55,6 +59,8 @@ Metadata:
         default: "Name of service to deploy"
       AppName:
         default: "Which environment to reference"
+      HostName:
+        default: "Desired hostname in centriqhome.com and centriq.me"
     ParameterGroups:
       - Label:
           default: GitHub Configuration
@@ -68,6 +74,7 @@ Metadata:
         Parameters:
           - AppName
           - AppEnvironment
+          - HostName
 
 
 Resources:
@@ -78,6 +85,7 @@ Resources:
       Parameters:
         AppName: !Ref AppName
         AppEnvironment: !Ref AppEnvironment
+        HostName: !Ref HostName
         GitHubUser: !Ref GitHubUser
         GitHubToken: !Ref GitHubToken
         GitHubRepo: !Ref GitHubRepo

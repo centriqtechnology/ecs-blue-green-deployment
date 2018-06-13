@@ -16,8 +16,37 @@ Parameters:
   Name:
     Type: String
 
+  HostName:
+    Type: String
 
 Resources:
+
+  # For centriqhome.com
+  HomeRecordSet:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: Z2LLJ2XVUGXONO
+      Comment: "Create friendly DNS name for stack ALB"
+      RecordSets:
+        - Name: !Sub "${HostName}.centriqhome.com"
+          Type: A
+          AliasTarget:
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
+
+  # For centriq.me
+  MeRecordSet:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: ZWBXC2YI5Q9HN
+      Comment: "Create friendly DNS name for stack ALB"
+      RecordSets:
+        - Name: !Sub "${HostName}.centriq.me"
+          Type: A
+          AliasTarget:
+            HostedZoneId: !GetAtt LoadBalancer.CanonicalHostedZoneID
+            DNSName: !GetAtt LoadBalancer.DNSName
+
   SecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -47,11 +76,11 @@ Resources:
         - !Ref Subnet2
       SecurityGroups:
         - !Ref SecurityGroup
-        
+
 Outputs:
   ServiceUrl:
     Description: URL of the load balancer for the sample service.
-    Value: !Sub http://${LoadBalancer.DNSName}
+    Value: !Sub https://${LoadBalancer.DNSName}
 
   SecurityGroup:
     Value: !Ref SecurityGroup
